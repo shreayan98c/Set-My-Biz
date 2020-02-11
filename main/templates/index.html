@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>SetMyBiz - Home</title>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+	<h1 class="display-4">SetMyBiz</h1>
+	<p class="lead">Welcome to SetMyBiz!</p>
+	<hr class="my-4">
+	<h2>Dynamic content</h2>
+	<p>The library has the following record counts:</p>
+	<!-- <ul>
+		<li><strong>Books:</strong> {{ num_books }} </li>
+		<li><strong>Copies:</strong> {{ num_instances }} </li>
+		<li><strong>Copies Available:</strong> {{ num_instances_available }} </li>
+		<li><strong>Authors:</strong> {{ num_authors }} </li>
+	</ul>
+	<div class="container">
+		<h2>Have a look at how ambient the LocalLibrary is.</h2>
+		<div class="embed-responsive embed-responsive-16by9">
+			<iframe style="width: 75%; height: 75%;" class="embed-responsive-item" width="1280" height="720" src="https://www.youtube.com/embed/4vIQON2fDWM" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+		</div>
+	</div> -->
+</div>
+<p class="alert-dark">You have visited this page {{ num_visits }}{% if num_visits == 1 %} time{% else %} times{% endif %}.</p>
+{% endblock %}
