@@ -1,0 +1,12 @@
+.main-body
+{
+	margin-top: 7%;
+}
+
+.footer
+{
+	position: fixed;
+	left: auto;
+	bottom: 0;
+	text-align: center;
+}

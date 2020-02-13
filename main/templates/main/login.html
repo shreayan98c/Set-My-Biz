@@ -1,9 +1,9 @@
 {% extends "main/base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
 	<form method="POST">
 		{% csrf_token %}
-		{{form.as_p}}
-
+		{{form|crispy}}
 		<button class="btn" type="submit">Login</button>
 	</form>
 	If you don't already have an account, <a href="/register"><strong>register</strong></a> instead.
