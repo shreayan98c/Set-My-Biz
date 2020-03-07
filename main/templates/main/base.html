@@ -33,6 +33,13 @@
 	</nav>
 	
 	<div class="container main-body">
+		{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">
+		{{ message }}
+		</div>
+		{% endfor %}
+		{% endif %}
 		{% block content %}
 		{% endblock %}
 		<footer class="footer mt-auto py-3">
