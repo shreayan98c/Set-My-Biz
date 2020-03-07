@@ -5,6 +5,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from .forms import NewUserForm
+from django.views import generic
+from django.contrib.auth.models import User
+from main.forms import NewUserForm
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 # Create your views here.
 
@@ -58,3 +62,7 @@ def login_request(request):
 	return render(request,
 				  "main/login.html",
 				  {"form": form})
+
+class UserDetailView(generic.DetailView):
+	model = User
+	template_name = 'main/user_detail.html'

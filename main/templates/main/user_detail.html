@@ -1,0 +1,11 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+<title>SetMyBiz - {{ user.first_name }} {{ user.last_name }}</title>
+{% endblock %}
+
+{% block content %}
+<h2>First Name: {{ user.first_name }}</h2>
+<h2>Surname: {{ user.last_name }}</h2>
+<h3>Email: {{ user.email }}</h3>
+{% endblock %}
