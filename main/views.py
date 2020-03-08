@@ -70,6 +70,15 @@ def business_input(request):
 	# Render the HTML template index.html with the data in the context variable
 	return render(request, 'main/new_business.html', context=context)
 
+def location(request):
+	"""View function to display best place to set business."""
+	city = request.POST.get("city")
+	radius = request.POST.get("radius")
+	context = dict()
+	context['city'] = city
+	context['radius'] = radius
+	# Render the HTML template with the data in the context variable
+	return render(request, 'main/location.html', context=context)
 
 class UserDetailView(generic.DetailView):
 	model = User

@@ -27,6 +27,7 @@ urlpatterns = [
 	path('login/', views.login_request, name='login'),
 
     path('business/', views.business_input, name='business'),
+    path('location/', views.location, name='location'),
 
     path('account/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
     path('account/<int:pk>/update/', views.UserUpdate.as_view(), name='user_update'),
