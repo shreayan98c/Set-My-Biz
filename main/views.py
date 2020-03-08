@@ -8,6 +8,7 @@ from .forms import NewUserForm
 from django.views import generic
 from django.contrib.auth.models import User
 from main.forms import NewUserForm
+from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 # Create your views here.
@@ -63,6 +64,20 @@ def login_request(request):
 				  "main/login.html",
 				  {"form": form})
 
+def business_input(request):
+	"""View function to get business details from user."""
+	context = dict()
+	# Render the HTML template index.html with the data in the context variable
+	return render(request, 'main/new_business.html', context=context)
+
+
 class UserDetailView(generic.DetailView):
 	model = User
 	template_name = 'main/user_detail.html'
+
+
+class UserUpdate(UpdateView):
+	model = User
+	fields = ['first_name', 'last_name']
+	template_name = 'main/update_user.html'
+	success_url = reverse_lazy('main:index')

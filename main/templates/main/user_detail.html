@@ -8,4 +8,6 @@
 <h2>First Name: {{ user.first_name }}</h2>
 <h2>Surname: {{ user.last_name }}</h2>
 <h3>Email: {{ user.email }}</h3>
+<hr>
+<a href="../{{ user.id }}/update"><button type="button" class="btn btn-primary">Update Details</button></a>
 {% endblock %}

@@ -21,8 +21,13 @@ app_name = 'main'
 
 urlpatterns = [
 	path('', views.index, name='index'),
+
 	path('register/', views.register, name='register'),
 	path('logout/', views.logout_request, name='logout'),
 	path('login/', views.login_request, name='login'),
+
+    path('business/', views.business_input, name='business'),
+
     path('account/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
+    path('account/<int:pk>/update/', views.UserUpdate.as_view(), name='user_update'),
 ]
