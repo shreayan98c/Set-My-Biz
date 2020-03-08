@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from main.forms import NewUserForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .utils import *
 
 # Create your views here.
 
@@ -70,15 +71,6 @@ def business_input(request):
 	# Render the HTML template index.html with the data in the context variable
 	return render(request, 'main/new_business.html', context=context)
 
-def location(request):
-	"""View function to display best place to set business."""
-	city = request.POST.get("city")
-	radius = request.POST.get("radius")
-	context = dict()
-	context['city'] = city
-	context['radius'] = radius
-	# Render the HTML template with the data in the context variable
-	return render(request, 'main/location.html', context=context)
 
 class UserDetailView(generic.DetailView):
 	model = User
@@ -90,3 +82,58 @@ class UserUpdate(UpdateView):
 	fields = ['first_name', 'last_name']
 	template_name = 'main/update_user.html'
 	success_url = reverse_lazy('main:index')
+
+
+def location(request):
+	"""View function to display best place to set business."""
+	city = request.POST.get("city")
+	radius = request.POST.get("radius")
+	context = dict()
+	context['city'] = city
+	context['radius'] = radius
+
+	offices = pd.read_csv('main/static/main/Companies.csv').values.tolist()
+	kl_df = pd.DataFrame({"Neighborhood": offices})
+
+	# call the function to get the coordinates, store in a new list using list comprehension
+	coords = [get_latlng(neighborhood, city) for neighborhood in kl_df["Neighborhood"].tolist()]
+	# create temporary dataframe to populate the coordinates into Latitude and Longitude
+	df_coords = pd.DataFrame(coords, columns=['Latitude', 'Longitude'])
+	# merge the coordinates into the original dataframe
+	kl_df['Latitude'] = df_coords['Latitude']
+	kl_df['Longitude'] = df_coords['Longitude']
+
+	# get the coordinates of Kuala Lumpur
+	address = city + ', India'
+
+	connected = False
+
+	while not connected:
+		try:
+			geolocator = Nominatim(user_agent="my-application")
+			location = geolocator.geocode(address)
+			latitude = location.latitude
+			longitude = location.longitude
+			print('The geograpical coordinate of {}, India is {}, {}.'.format(city, latitude, longitude))
+			connected = True
+		except:
+			pass
+
+	# create map of Toronto using latitude and longitude values
+	map_kl = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+	# add markers to map
+	for lat, lng, neighborhood in zip(kl_df['Latitude'], kl_df['Longitude'], kl_df['Neighborhood']):
+		label = '{}'.format(neighborhood)
+		label = folium.Popup(label, parse_html=True)
+		folium.CircleMarker(
+			[lat, lng],
+			radius=5,
+			popup=label,
+			color='blue',
+			fill=True,
+			fill_color='#3186cc',
+			fill_opacity=0.7).add_to(map_kl)
+
+	# Render the HTML template with the data in the context variable
+	return render(request, 'main/location.html', context=context)
