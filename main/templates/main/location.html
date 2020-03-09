@@ -8,25 +8,41 @@
 {% block content %}
 
 <div class="jumbotron">
-	
-	<h3>
-		City: {{ city }} <br>
-		Radius: {{ radius }} <br>
-		Coordinates: {{ latitude }}, {{ longitude }}
-	</h3>
+	<h1 class="display-4">Location Analysis</h1>
+	<hr class="my-4">
+	<h2>
+		City selected: {{ city }} <br>
+	</h2>
+	<h2>
+		Radius to search the vicinity: {{ radius }} km(s) <br>
+	</h2>
+	<h2>
+		Coordinates: ({{ latitude }}, {{ longitude }})
+	</h2>
 
 	<h3>
-		Map (map):
+		Map containing all the offices in the city:
 	</h3>
 	{{ map|safe }}
 
+	<br><br><br>
+
 	<h3>
-		Map:
+		List of competitors:
 	</h3>
-	{{ map.html.render|safe }}
-  	<script>
-    	{{ map.script.render|safe }}
-  	</script>
+	{{ venues_df|safe }}
+	<h3>There are {{ unique }} uniques categories of restaurants.</h3>
+
+	<h3>
+		Map containing all clusters formed:
+	</h3>
+	{{ map_clusters|safe }}
+	
+	<h3>
+		List of places in best cluster:
+	</h3>
+	{{ best_df|safe }}
+
 </div>
 
 {% endblock %}

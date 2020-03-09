@@ -24,7 +24,7 @@ function validate()
 		return false;
 	}	
 
-	document.getElementById('warnMsg').innerHTML = 'Please wait, it may take several minutes to fetch the data. <br>';
+	document.getElementById('warnMsg').innerHTML = 'Please wait, it may take several minutes to fetch the data. <br><br>';
 	document.getElementById('warnMsg').style.color = 'red';
 
 	// If all validations are complete, return true

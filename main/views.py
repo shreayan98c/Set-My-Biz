@@ -127,12 +127,8 @@ def location(request):
 		except:
 			pass
 
-	# creating a folium figure
-	figure = folium.Figure()
-
 	# create map of Toronto using latitude and longitude values
-	map_kl = folium.Map(location=[latitude, longitude], zoom_start=12)
-	map_kl.add_to(figure)
+	map_offices = folium.Map(location=[latitude, longitude], zoom_start=12)
 
 	# add markers to map
 	for lat, lng, neighborhood in zip(kl_df['Latitude'], kl_df['Longitude'], kl_df['Neighborhood']):
@@ -145,14 +141,169 @@ def location(request):
 			color='blue',
 			fill=True,
 			fill_color='#3186cc',
-			fill_opacity=0.7).add_to(map_kl)
+			fill_opacity=0.7).add_to(map_offices)
 
-	map_kl.save('map.html')
-	figure.render()
-	# context['map'] = figure
-	context['map'] = map_kl._repr_html_()
+	# define Foursquare Credentials and Version
+	CLIENT_ID = 'WEMY4AM5NRBMPJ55IDUZ1XRYOHE52FANWWSHMCT2S0I1JUG3' # your Foursquare ID
+	CLIENT_SECRET = 'GAGO1KZFQ1DI3IKT1DG42DNQLGHPEBSJIE0QMDRXBJIHGJB1' # your Foursquare Secret
+	VERSION = '20180605' # Foursquare API version
+
+	radius = radius * 1000 # km to m
+	LIMIT = 1
+
+	venues = []
+
+	for lat, long, neighborhood in zip(kl_df['Latitude'], kl_df['Longitude'], kl_df['Neighborhood']):
+	    
+		# create the API request URL
+		url = "https://api.foursquare.com/v2/venues/explore?client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}&categoryId=4d4b7105d754a06374d81259".format(
+			CLIENT_ID,
+			CLIENT_SECRET,
+			VERSION,
+			lat,
+			long,
+			radius, 
+			LIMIT)
+
+		# make the GET request
+		results = requests.get(url).json()["response"]["groups"][0]["items"]
+
+		# return only relevant information for each nearby venue
+		for venue in results:
+			venues.append((
+				neighborhood,
+				lat, 
+				long, 
+				venue['venue']['name'], 
+				venue['venue']['location']['lat'], 
+				venue['venue']['location']['lng'],  
+				venue['venue']['categories'][0]['name']))
+
+	# convert the venues list into a new DataFrame
+	venues_df = pd.DataFrame(venues)
+
+	# define the column names
+	venues_df.columns = ['Neighborhood', 'Latitude', 'Longitude', 'VenueName', 'VenueLatitude', 'VenueLongitude', 'VenueCategory']
+
+	context['venues_df'] = venues_df.to_html()
+
+	context['unique'] = len(venues_df['VenueCategory'].unique())
+	print('There are {} uniques categories.'.format(len(venues_df['VenueCategory'].unique())))
+
+	print('Connected to Foursquare!')
+
+
+	# one hot encoding
+	kl_onehot = pd.get_dummies(venues_df[['VenueCategory']], prefix="", prefix_sep="")
+
+	# add neighborhood column back to dataframe
+	kl_onehot['Neighborhoods'] = venues_df['Neighborhood'] 
+
+	# move neighborhood column to the first column
+	fixed_columns = [kl_onehot.columns[-1]] + list(kl_onehot.columns[:-1])
+	kl_onehot = kl_onehot[fixed_columns]
+
+	kl_grouped = kl_onehot.groupby(["Neighborhoods"]).mean().reset_index()
+
+	kl_mall = kl_grouped
+
+	# set number of clusters
+	kclusters = 10
+
+	kl_clustering = kl_mall.drop(["Neighborhoods"], 1)
+
+	# run k-means clustering
+	kmeans = KMeans(n_clusters=kclusters, random_state=0).fit(kl_clustering)
+
+	# check cluster labels generated for each row in the dataframe
+	kmeans.labels_[0:10] 
+
+	# create a new dataframe that includes the cluster as well as the top 10 venues for each neighborhood.
+	kl_merged = kl_mall.copy()
+
+	# add clustering labels
+	kl_merged["Cluster Labels"] = kmeans.labels_
+
+	kl_merged.rename(columns={"Neighborhoods": "Neighborhood"}, inplace=True)
+
+	# merge toronto_grouped with toronto_data to add latitude/longitude for each neighborhood
+	kl_merged = kl_merged.join(kl_df.set_index("Neighborhood"), on="Neighborhood")
+
+	# sort the results by Cluster Labels
+	kl_merged.sort_values(["Cluster Labels"], inplace=True)
+	
+	# create map
+	map_clusters = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+	# set color scheme for the clusters
+	x = np.arange(kclusters)
+	ys = [i+x+(i*x)**2 for i in range(kclusters)]
+	colors_array = cm.rainbow(np.linspace(0, 1, len(ys)))
+	rainbow = [colors.rgb2hex(i) for i in colors_array]
+
+	# add markers to the map
+	markers_colors = []
+	for lat, lon, poi, cluster in zip(kl_merged['Latitude'], kl_merged['Longitude'], kl_merged['Neighborhood'], kl_merged['Cluster Labels']):
+		label = folium.Popup(str(poi) + ' - Cluster ' + str(cluster), parse_html=True)
+		folium.CircleMarker(
+			[lat, lon],
+			radius=5,
+			popup=label,
+			color=rainbow[cluster-1],
+			fill=True,
+			fill_color=rainbow[cluster-1],
+			fill_opacity=0.7).add_to(map_clusters)
+	       
+	map_clusters.save('main/templates/main/map_clusters.html')
+	context['map_clusters'] = map_clusters._repr_html_()
+
+	map_offices.save('main/templates/main/map.html')
+	context['map'] = map_offices._repr_html_()
 	
 	print('Plotting completed!')
+
+	cluster_id = []
+	num_references = []
+	center_latitude = []
+	center_longitude = []
+	for i in range(kclusters):
+		cluster_id.append(i)
+		num_references.append(kl_merged.loc[kl_merged['Cluster Labels'] == i].shape[0])
+		center_latitude.append(kl_merged['Latitude'].loc[kl_merged['Cluster Labels'] == i].mean(axis=0))
+		center_longitude.append(kl_merged['Longitude'].loc[kl_merged['Cluster Labels'] == i].mean(axis=0))
+	
+	pos = num_references.index(max(num_references))
+
+	context['best_df'] = kl_merged.loc[kl_merged['Cluster Labels'] == pos].to_html()
+
+	final_data = pd.DataFrame(list(zip(cluster_id, num_references, center_latitude, center_longitude)),
+                         columns=['Cluster ID', 'Num. of Reference Points', 'Center Latitude', 'Center Longitude'])
+
+	i=0
+	for i in range(kclusters):
+		temp_df = kl_merged.loc[kl_merged['Cluster Labels'] == i]
+		lat = final_data['Center Latitude'][i]
+		long = final_data['Center Longitude'][i]
+		dist_list = []
+		for j in range(len(temp_df)):
+		    dist_list.append(distance(temp_df['Latitude'].iloc[j], lat, temp_df['Longitude'].iloc[j], long))
+		if(i==1):
+		    dist_list = [ele/5 for ele in dist_list]
+		temp_df['Distance from center'] = dist_list
+		manhattan = sum(dist_list)
+		ms=0
+		for k in dist_list:
+		    ms += k**2
+		rms=sqrt(ms)
+		comp = 2*len(dist_list)+1
+		cluster_score_manhattan = manhattan/comp
+		cluster_score_rms = rms/comp
+		print('Cluster',i)
+		print(temp_df[['Neighborhood', 'Cluster Labels', 'Latitude', 'Longitude', 'Distance from center']])
+		print('Number of Competitors:', comp)
+		print('Manhattan distance:', manhattan, '\tRMS distance:', rms)
+		print(f'Cluster Score (Distance / Number of competitors):\nManhattan: {cluster_score_manhattan}\tRMS: {cluster_score_rms}')
+		print('-------------------------------------------------------------------------------')
 
 	# Render the HTML template with the data in the context variable
 	return render(request, 'main/location.html', context=context)
