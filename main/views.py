@@ -92,8 +92,12 @@ def location(request):
 	context['city'] = city
 	context['radius'] = radius
 
+	print('Entered location function')
+
 	offices = pd.read_csv('main/static/main/Companies.csv').values.tolist()
 	kl_df = pd.DataFrame({"Neighborhood": offices})
+
+	print('Loaded the company list, now getting coordinates')
 
 	# call the function to get the coordinates, store in a new list using list comprehension
 	coords = [get_latlng(neighborhood, city) for neighborhood in kl_df["Neighborhood"].tolist()]
@@ -103,6 +107,8 @@ def location(request):
 	kl_df['Latitude'] = df_coords['Latitude']
 	kl_df['Longitude'] = df_coords['Longitude']
 
+	print('Searching for city coordinates')
+	
 	# get the coordinates of Kuala Lumpur
 	address = city + ', India'
 
@@ -114,13 +120,19 @@ def location(request):
 			location = geolocator.geocode(address)
 			latitude = location.latitude
 			longitude = location.longitude
+			context['latitude'] = latitude
+			context['longitude'] = longitude
 			print('The geograpical coordinate of {}, India is {}, {}.'.format(city, latitude, longitude))
 			connected = True
 		except:
 			pass
 
+	# creating a folium figure
+	figure = folium.Figure()
+
 	# create map of Toronto using latitude and longitude values
 	map_kl = folium.Map(location=[latitude, longitude], zoom_start=12)
+	map_kl.add_to(figure)
 
 	# add markers to map
 	for lat, lng, neighborhood in zip(kl_df['Latitude'], kl_df['Longitude'], kl_df['Neighborhood']):
@@ -134,6 +146,13 @@ def location(request):
 			fill=True,
 			fill_color='#3186cc',
 			fill_opacity=0.7).add_to(map_kl)
+
+	map_kl.save('map.html')
+	figure.render()
+	# context['map'] = figure
+	context['map'] = map_kl._repr_html_()
+	
+	print('Plotting completed!')
 
 	# Render the HTML template with the data in the context variable
 	return render(request, 'main/location.html', context=context)

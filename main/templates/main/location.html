@@ -2,11 +2,31 @@
 
 {% block title %}
 <title>SetMyBiz - Location</title>
+{{ map.header.render|safe }}
 {% endblock %}
 
 {% block content %}
 
-	City: {{ city }} <br>
-	Radius: {{ radius }}
+<div class="jumbotron">
+	
+	<h3>
+		City: {{ city }} <br>
+		Radius: {{ radius }} <br>
+		Coordinates: {{ latitude }}, {{ longitude }}
+	</h3>
+
+	<h3>
+		Map (map):
+	</h3>
+	{{ map|safe }}
+
+	<h3>
+		Map:
+	</h3>
+	{{ map.html.render|safe }}
+  	<script>
+    	{{ map.script.render|safe }}
+  	</script>
+</div>
 
 {% endblock %}
