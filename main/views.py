@@ -12,6 +12,21 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .utils import *
 import random
+import numpy as np # library to handle data in a vectorized manner
+import pandas as pd # library for data analsysis
+import json # library to handle JSON files
+from geopy.geocoders import Nominatim # convert an address into latitude and longitude values
+import geocoder # to get coordinates
+import requests # library to handle requests
+from bs4 import BeautifulSoup # library to parse HTML and XML documents
+from pandas.io.json import json_normalize # tranform JSON file into a pandas dataframe
+# Matplotlib and associated plotting modules
+import matplotlib.cm as cm
+import matplotlib.colors as colors
+# import k-means from clustering stage
+from sklearn.cluster import KMeans
+import folium # map rendering library
+from math import radians, cos, sin, asin, sqrt
 
 # Create your views here.
 
