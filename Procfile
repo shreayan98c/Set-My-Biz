@@ -1,1 +1,1 @@
-web: gunicorn SetMyBiz.wsgi --timeout 600
+web: gunicorn SetMyBiz.wsgi --log-level=debug --timeout=600
