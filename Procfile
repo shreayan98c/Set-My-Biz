@@ -1,1 +1,1 @@
-web: gunicorn SetMyBiz.wsgi
+web: gunicorn SetMyBiz.wsgi --timeout 600
