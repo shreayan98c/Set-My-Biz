@@ -1,15 +1,20 @@
 # Set-My-Biz
 An application to help you find the best place to set up your business.
 
-Languages Used: Python, HTML, CSS, JavaScript.
+**Languages Used:** Python, HTML, CSS, JavaScript.
 
-Metrics used for evaluating Clusters:
-Haversine's Formula: Distance d between 2 coordinates (x1,y1) and (x2,y2) 
-d = 2r arcsin * sqrt( sin2(x2-x1)/2) + cos(x1) * cos(x2) * sin2(y2-y1)/2) )
+**Diagrammatic Explanation:**
 
-Proximity Measure = RMS of elements in cluster / Number of elements in cluster
+![](images/diagram.PNG)
 
-Cluster Score = Proximity Measure / Number of Competitors in that cluster
+**Metrics used for evaluating Clusters:**
+
+![](images/metrics.PNG)
+
+**Example of Cluster formation:**
+
+![](images/example.PNG)
+![](images/clusters.PNG)
 
 Best cluster will be the one having the least Cluster Score.
 
