@@ -1,1 +1,1 @@
-web: gunicorn set-my-biz.wsgi
+web: gunicorn SetMyBiz.wsgi
