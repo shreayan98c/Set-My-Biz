@@ -95,8 +95,8 @@ def location(request):
 
 	print('Entered location function')
 
-	# offices = pd.read_csv('main/static/main/Companies.csv').values.tolist()
-	offices = ['Amazon','Infosys','Dell','HP','Tech Mahindra','SAP','Samsung R&D','Accenture','Wipro','TCS', 'IBM', 'Cognizant','Capgemini','Cisco','Mindtree','HCL','Mu Sigma','Robert Bosch','Honeywell','CGI',	'Mphasis','EY','Deloitte','Nokia','Intel','Huawei','Goldman Sachs','Flipkart','KPMG','Zomato','Swiggy','HP']
+	offices = pd.read_csv('main/static/main/Companies.csv', encoding='latin-1').values.tolist()
+	# offices = ['Amazon','Infosys','Dell','HP','Tech Mahindra','SAP','Samsung R&D','Accenture','Wipro','TCS', 'IBM', 'Cognizant','Capgemini','Cisco','Mindtree','HCL','Mu Sigma','Robert Bosch','Honeywell','CGI',	'Mphasis','EY','Deloitte','Nokia','Intel','Huawei','Goldman Sachs','Flipkart','KPMG','Zomato','Swiggy','HP']
 
 	kl_df = pd.DataFrame({"Neighborhood": offices})
 
