@@ -25,8 +25,9 @@
 	</h3>
 	{{ map|safe }}
 
-	<br><br><br>
-
+	<br>
+	
+	<!-- 
 	<h3>
 		List of competitors:
 	</h3>
@@ -36,13 +37,19 @@
 	<h3>
 		Map containing all clusters formed:
 	</h3>
-	{{ map_clusters|safe }}
+	{{ map_clusters|safe }} 
 	
 	<h3>
 		List of places in best cluster:
 	</h3>
 	{{ best_df|safe }}
+	-->
+
+	<h3>
+		Ideal location to set up business would be: <br>
+		({{ best_lat }}, {{ best_long }}) <br>
+		In the vicinity of {{place_1}}, {{place_2}} and {{place_3}}.
+ 	</h3>
 
 </div>
-
 {% endblock %}

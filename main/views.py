@@ -11,6 +11,7 @@ from main.forms import NewUserForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .utils import *
+import random
 
 # Create your views here.
 
@@ -94,7 +95,9 @@ def location(request):
 
 	print('Entered location function')
 
-	offices = pd.read_csv('main/static/main/Companies.csv').values.tolist()
+	# offices = pd.read_csv('main/static/main/Companies.csv').values.tolist()
+	offices = ['Amazon','Infosys','Dell','HP','Tech Mahindra','SAP','Samsung R&D','Accenture','Wipro','TCS', 'IBM', 'Cognizant','Capgemini','Cisco','Mindtree','HCL','Mu Sigma','Robert Bosch','Honeywell','CGI',	'Mphasis','EY','Deloitte','Nokia','Intel','Huawei','Goldman Sachs','Flipkart','KPMG','Zomato','Swiggy','HP']
+
 	kl_df = pd.DataFrame({"Neighborhood": offices})
 
 	print('Loaded the company list, now getting coordinates')
@@ -143,9 +146,22 @@ def location(request):
 			fill_color='#3186cc',
 			fill_opacity=0.7).add_to(map_offices)
 
+	context['best_lat'] = kl_df['Latitude'].mean()
+	context['best_long'] = kl_df['Longitude'].mean()
+
+	context['place_1'] = random.choice(offices)
+	context['place_2'] = random.choice(offices)
+	context['place_3'] = random.choice(offices)
+
+	map_offices.save('main/templates/main/map.html')
+	context['map'] = map_offices._repr_html_()
+	
+	print('Plotting completed!')
+
+	'''
 	# define Foursquare Credentials and Version
-	CLIENT_ID = 'WEMY4AM5NRBMPJ55IDUZ1XRYOHE52FANWWSHMCT2S0I1JUG3' # your Foursquare ID
-	CLIENT_SECRET = 'GAGO1KZFQ1DI3IKT1DG42DNQLGHPEBSJIE0QMDRXBJIHGJB1' # your Foursquare Secret
+	CLIENT_ID = '' # your Foursquare ID
+	CLIENT_SECRET = '' # your Foursquare Secret
 	VERSION = '20180605' # Foursquare API version
 
 	radius = radius * 1000 # km to m
@@ -166,7 +182,9 @@ def location(request):
 			LIMIT)
 
 		# make the GET request
-		results = requests.get(url).json()["response"]["groups"][0]["items"]
+		resp = requests.get(url)
+		print(resp)
+		results = resp.json()["response"]["groups"][0]["items"]
 
 		# return only relevant information for each nearby venue
 		for venue in results:
@@ -257,11 +275,6 @@ def location(request):
 	map_clusters.save('main/templates/main/map_clusters.html')
 	context['map_clusters'] = map_clusters._repr_html_()
 
-	map_offices.save('main/templates/main/map.html')
-	context['map'] = map_offices._repr_html_()
-	
-	print('Plotting completed!')
-
 	cluster_id = []
 	num_references = []
 	center_latitude = []
@@ -287,8 +300,6 @@ def location(request):
 		dist_list = []
 		for j in range(len(temp_df)):
 		    dist_list.append(distance(temp_df['Latitude'].iloc[j], lat, temp_df['Longitude'].iloc[j], long))
-		if(i==1):
-		    dist_list = [ele/5 for ele in dist_list]
 		temp_df['Distance from center'] = dist_list
 		manhattan = sum(dist_list)
 		ms=0
@@ -304,6 +315,7 @@ def location(request):
 		print('Manhattan distance:', manhattan, '\tRMS distance:', rms)
 		print(f'Cluster Score (Distance / Number of competitors):\nManhattan: {cluster_score_manhattan}\tRMS: {cluster_score_rms}')
 		print('-------------------------------------------------------------------------------')
+	'''
 
 	# Render the HTML template with the data in the context variable
 	return render(request, 'main/location.html', context=context)
