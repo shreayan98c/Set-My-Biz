@@ -3,6 +3,12 @@ An application to help you find the best place to set up your business.
 
 **Languages Used:** Python, HTML, CSS, JavaScript.
 
+**Demo:**
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=lvfHyByeIXo" target="_blank"><img src="http://img.youtube.com/vi/lvfHyByeIXo/0.jpg" alt="SetMyBiz" width="1000" height="600"/></a>
+
+**YouTube Link:** https://youtu.be/lvfHyByeIXo
+
 **Diagrammatic Explanation:**
 
 ![](images/diagram.PNG)
