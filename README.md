@@ -22,7 +22,7 @@ An application to help you find the best place to set up your business.
 ![](images/example.PNG)
 ![](images/clusters.PNG)
 
-Best cluster will be the one having the least Cluster Score.
+Best cluster will be the one having the highest Cluster Score.
 
 The Manhattan and RMS distance is computed for clusters and used each cluster score calculation. The clusters that have only a single reference point in them have been neglected since their cluster score will be zero.
 
